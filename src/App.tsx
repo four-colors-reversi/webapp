@@ -1,7 +1,7 @@
-import Field from './components/Field'
+import Game from './components/Game'
 
 function App() {
-	return <Field></Field>
+	return <Game></Game>
 }
 
 export default App

@@ -1,40 +1,49 @@
-import { useMemo } from 'react'
+import GameManager, { Position } from '../utils/game'
 
-import GameManager, { Player, Position, Stone } from '../utils/game'
-
+import { GameState } from './Game'
 import StoneElement from './StoneElement'
 
 interface Props {
-	field: Stone[][]
-	players: Player[]
+	gameState: GameState
+	executeAction: Function
+	isMyTurn: boolean
 }
 
 const Field = (props: Props) => {
-	const stones: JSX.Element[] = useMemo(() => {
-		const new_stones: JSX.Element[] = []
-		for (let y = 0; y < props.field[0].length; y++) {
-			const stone_line: JSX.Element[] = []
-			for (let x = 0; x < props.field.length; x++) {
-				stone_line.push(
-					<StoneElement
-						data={props.field[x][y]}
-						key={`${x}_${y}`}
-						onClick={() => {
-							if (GameManager.setStone(props.field, props.players, { x: x, y: y }, now_color)) {
-								setField(props.field)
-								setTurn(turn + 1)
-							}
-						}}
-						settable={settablePositions.some((p: Position) => p.x == x && p.y == y)}
-					/>
-				)
-			}
-			new_stones.push(<div className='flex flex-row'>{stone_line}</div>)
-		}
-		return new_stones
-	}, [field, players, now_color, settablePositions])
+	const now_color: string = GameManager.getTurnColor(props.gameState.turn, props.gameState.players)
 
-	return <div className='flex flex-col w-fit h-fit border border-black border-solid'>{stones}</div>
+	const settablePositions = GameManager.getSettablePositions(props.gameState.field, now_color)
+
+	const stones: JSX.Element[] = []
+	for (let y = 0; y < props.gameState.field[0].length; y++) {
+		const stone_line: JSX.Element[] = []
+		for (let x = 0; x < props.gameState.field.length; x++) {
+			stone_line.push(
+				<StoneElement
+					data={props.gameState.field[x][y]}
+					key={`${x}_${y}`}
+					onClick={() => {
+						props.executeAction({ type: 'SET', data: { position: { x: x, y: y } } })
+					}}
+					settable={settablePositions.some((p: Position) => p.x == x && p.y == y)}
+				/>
+			)
+		}
+		stones.push(
+			<div className='flex flex-row' key={stones.length}>
+				{stone_line}
+			</div>
+		)
+	}
+
+	return (
+		<div
+			className='flex flex-col w-fit h-fit border border-black border-solid'
+			style={props.isMyTurn ? {} : { filter: 'grayscale(1)' }}
+		>
+			{stones}
+		</div>
+	)
 }
 
 export default Field

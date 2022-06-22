@@ -1,43 +1,150 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, ChangeEvent, useMemo } from 'react'
 
-import GameManager, { Player, Stone, Position } from '../utils/game'
+import GameManager, { Stone, Player } from '../utils/game'
 
 import Field from './Field'
 
-const Game = () => {
-	const [players, setPlayers] = useState<Player[]>([
-		new Player('p1', '#000000', '#0000ff'),
-		new Player('p2', '#ff0000', '#00ff00'),
-	])
-	const [field, setField] = useState<Stone[][]>(GameManager.createInitialField(players))
-	const [turn, setTurn] = useState<number>(1)
+export interface GameState {
+	turn: number
+	players: Player[]
+	field: Stone[][]
+	score: number[]
+}
 
-	const now_color = useMemo(() => GameManager.getTurnColor(turn, players), [turn, players])
-	const [settablePositions, setSettablePositions] = useState<Position[]>(
-		GameManager.getSettablePositions(field, now_color)
-	)
-	const scores = useMemo(() => {
-		console.log(GameManager.calcScores(field, players))
-		return GameManager.calcScores(field, players)
-	}, [field])
-
-	useEffect(() => {
-		setField(GameManager.createInitialField(players))
-	}, [players])
-
-	useEffect(() => {
-		const new_settable_positions = GameManager.getSettablePositions(field, now_color)
-		if (new_settable_positions.length <= 0) {
-			setTurn(turn + 1)
-		} else {
-			console.log(1)
-			setSettablePositions(new_settable_positions)
+interface SetAction {
+	type: 'SET'
+	data: {
+		position: {
+			x: number
+			y: number
 		}
-	}, [field, now_color])
+	}
+}
+
+interface PassAction {
+	type: 'PASS'
+}
+
+const Game = () => {
+	const [playerName, setPlayerName] = useState<string>('player')
+	const [roomId, setRoomId] = useState<string>('')
+	const [gameWs, setGameWs] = useState<WebSocket | null>(null)
+	const [isGameEnd, setIsGameEnd] = useState<boolean>(false)
+	const [gameState, setGameState] = useState<GameState | null>(null)
+
+	const onMessageGameWs = (msg: MessageEvent<any>) => {
+		const response = JSON.parse(msg.data)
+		console.log(response)
+		switch (response.type) {
+			case 'UPDATE': {
+				setGameState({
+					turn: response.turn,
+					players: [
+						new Player(
+							response.players[0].name,
+							response.players[0].colors[0],
+							response.players[0].colors[1]
+						),
+						new Player(
+							response.players[1].name,
+							response.players[1].colors[0],
+							response.players[1].colors[1]
+						),
+					],
+					field: response.field,
+					score: response.score,
+				})
+				break
+			}
+			case 'END': {
+				setIsGameEnd(true)
+				break
+			}
+		}
+	}
+
+	const onMessageMatchingWs = (msg: MessageEvent<any>) => {
+		const response = JSON.parse(msg.data)
+		console.log(response)
+		switch (response.type) {
+			case 'JOINED': {
+				break
+			}
+			case 'MATCHED': {
+				const game_ws = new WebSocket(
+					response.url,
+					btoa(JSON.stringify({ data: { session_id: response.session_id } })).replaceAll('=', '')
+				)
+				game_ws.onmessage = onMessageGameWs
+				setGameWs(game_ws)
+				break
+			}
+		}
+	}
+
+	const createMatchingRoom = () => {
+		const action = { type: 'CREATE', data: { player_name: playerName } }
+		const action_base64 = btoa(JSON.stringify(action)).replaceAll('=', '')
+		const ws = new WebSocket('ws://localhost:8080/matching', action_base64)
+		ws.onmessage = onMessageMatchingWs
+	}
+
+	const joinMatchingRoom = () => {
+		const action = { type: 'JOIN', data: { player_name: playerName, room_id: roomId } }
+		const action_base64 = btoa(JSON.stringify(action)).replaceAll('=', '')
+		const ws = new WebSocket('ws://localhost:8080/matching', action_base64)
+		ws.onmessage = onMessageMatchingWs
+	}
+
+	const executeAction = (action: SetAction | PassAction) => {
+		if (gameWs == null) return
+		console.log(action)
+		gameWs.send(JSON.stringify(action))
+	}
+
+	const is_my_turn = useMemo(() => {
+		if (gameState?.turn == undefined || gameState?.players == undefined) return false
+		if (GameManager.getTurnPlayer(gameState?.turn, gameState?.players).name == playerName)
+			return true
+		return false
+	}, [gameState])
 
 	return (
 		<div>
-			<Field />
+			{gameWs == null || gameState == null ? (
+				<div>
+					<input
+						onChange={(e: ChangeEvent<HTMLInputElement>) => {
+							setPlayerName(e.target.value)
+						}}
+						value={playerName}
+					/>
+					<input
+						onChange={(e: ChangeEvent<HTMLInputElement>) => {
+							setRoomId(e.target.value)
+						}}
+						value={roomId}
+					/>
+					<button onClick={() => createMatchingRoom()}>create matching</button>
+					<button onClick={() => joinMatchingRoom()}>join matching</button>
+				</div>
+			) : (
+				<div>
+					<p>
+						{gameState.players[0].name}
+						{gameState.players[0].name == playerName ? '(you)' : null}: {gameState.score[0]}
+					</p>
+					<p>
+						{gameState.players[1].name}
+						{gameState.players[1].name == playerName ? '(you)' : null}: {gameState.score[1]}
+					</p>
+					<Field
+						executeAction={(action: SetAction | PassAction) => executeAction(action)}
+						gameState={gameState}
+						isMyTurn={is_my_turn}
+					/>
+				</div>
+			)}
 		</div>
 	)
 }
