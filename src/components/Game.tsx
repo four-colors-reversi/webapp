@@ -113,12 +113,12 @@ const Game = () => {
 	return (
 		<div className='flex relative px-3 w-screen h-screen bg-slate-300'>
 			{gameWs == null || gameState == null ? (
-				<div className='flex flex-col gap-3 justify-center mx-auto w-[600px] max-w-[700px] align-middle'>
+				<div className='flex flex-col gap-3 justify-center mx-auto w-[600px] max-w-full align-middle'>
 					<div className='flex flex-col gap-3 p-6 bg-slate-100 rounded-xl shadow-xl'>
 						<div className='py-3 font-mono text-3xl font-bold text-center'>
 							<p className='text-slate-700'>4 COLOR REVERSI</p>
 						</div>
-						<div className='flex gap-3'>
+						<div className='flex flex-col gap-3 md:flex-row'>
 							<div className='flex flex-col flex-1 gap-1'>
 								<label className='text-slate-700' htmlFor='player_name'>
 									Player Name
@@ -148,18 +148,19 @@ const Game = () => {
 								/>
 							</div>
 						</div>
-						<div className='flex gap-3'>
+						<div className='flex flex-col-reverse gap-3 md:flex-row'>
 							<button
-								className='p-3 font-mono text-xl text-white bg-orange-500 rounded-lg'
+								className='py-3 font-mono text-sm text-slate-700 bg-slate-200 rounded-lg hover:opacity-80 active:opacity-100 transition-opacity duration-100 cursor-pointer md:p-3 md:text-xl md:text-white md:bg-orange-500'
 								onClick={() => createMatchingRoom()}
 							>
 								CREATE ROOM
 							</button>
+							<hr className='border-slate-300 md:hidden'></hr>
 							<button
-								className='flex-1 p-3 w-full font-mono text-xl font-bold text-white bg-blue-600 rounded-lg'
+								className='flex-1 p-3 w-full font-mono text-xl font-bold text-white bg-blue-600 rounded-lg hover:opacity-80 active:opacity-100 transition-opacity duration-100 cursor-pointer'
 								onClick={() => joinMatchingRoom()}
 							>
-								JOIN MATCHING !!
+								JOIN ROOM !!
 							</button>
 						</div>
 					</div>
