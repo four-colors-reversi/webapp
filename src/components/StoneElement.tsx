@@ -18,11 +18,13 @@ const StoneElement = (props: Props): JSX.Element => {
 	}
 
 	const base_props: React.HTMLAttributes<HTMLDivElement> = {
-		className: 'w-8 h-8 border border-black border-solid',
+		className:
+			'w-full h-full aspect-square flex-1 min-w-8 min-h-8 border border-slate-400 p-[0.5%] border-solid',
 		onClick: () => props.onClick(),
 	}
 	const base_stone_props: React.HTMLAttributes<HTMLDivElement> = {
-		className: 'w-full h-full rounded-full flex justify-center items-center',
+		className:
+			'w-full h-full rounded-full flex justify-center items-center text-sm md:text-lg lg:text-xl',
 	}
 	if (props.data.color !== null) {
 		base_stone_props.style = {
@@ -38,9 +40,7 @@ const StoneElement = (props: Props): JSX.Element => {
 	}
 	return (
 		<div {...base_props}>
-			<div {...base_stone_props}>
-				{props.data.value > 1 ? <span>{props.data.value}</span> : null}
-			</div>
+			<p {...base_stone_props}>{props.data.value > 1 ? <span>{props.data.value}</span> : null}</p>
 		</div>
 	)
 }

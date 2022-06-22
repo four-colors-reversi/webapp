@@ -166,20 +166,43 @@ const Game = () => {
 					</div>
 				</div>
 			) : (
-				<div>
-					<p>
-						{gameState.players[0].name}
-						{gameState.players[0].name == playerName ? '(you)' : null}: {gameState.score[0]}
-					</p>
-					<p>
-						{gameState.players[1].name}
-						{gameState.players[1].name == playerName ? '(you)' : null}: {gameState.score[1]}
-					</p>
-					<Field
-						executeAction={(action: SetAction | PassAction) => executeAction(action)}
-						gameState={gameState}
-						isMyTurn={is_my_turn}
-					/>
+				<div className='m-auto w-full max-w-[800px]'>
+					<div className='flex flex-col gap-3 justify-center px-3 mx-auto max-w-full align-middle'>
+						<div className='flex gap-3 pb-6'>
+							<div
+								className={`bg-slate-100 rounded-lg shadow-lg p-3 min-[100px] w-[30%] transition duration-100 ${
+									is_my_turn ? 'scale-125' : 'bg-slate-200'
+								}`}
+							>
+								<p className='text-xl text-center truncate'>
+									{gameState.players[0].name}{' '}
+									{gameState.players[0].name == playerName ? '(you)' : null}
+								</p>
+								<p className='font-mono font-bold text-center text-slate-700 md:text-2xl lg:text-3xl'>
+									{gameState.score[0]}
+								</p>
+							</div>
+							<div className='flex-1'></div>
+							<div
+								className={`bg-slate-100 rounded-lg shadow-lg p-3 min-[100px] w-[30%] transition duration-100 ${
+									!is_my_turn ? 'scale-125' : 'bg-slate-200'
+								}`}
+							>
+								<p className='text-xl text-center truncate'>
+									{gameState.players[1].name}{' '}
+									{gameState.players[1].name == playerName ? '(you)' : null}
+								</p>
+								<p className='font-mono text-xl font-bold text-center text-slate-700'>
+									{gameState.score[1]}
+								</p>
+							</div>
+						</div>
+						<Field
+							executeAction={(action: SetAction | PassAction) => executeAction(action)}
+							gameState={gameState}
+							isMyTurn={is_my_turn}
+						/>
+					</div>
 				</div>
 			)}
 		</div>
