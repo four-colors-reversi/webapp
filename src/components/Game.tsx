@@ -85,14 +85,14 @@ const Game = () => {
 	const createMatchingRoom = () => {
 		const action = { type: 'CREATE', data: { player_name: playerName } }
 		const action_base64 = btoa(JSON.stringify(action)).replaceAll('=', '')
-		const ws = new WebSocket('ws://localhost:8080/matching', action_base64)
+		const ws = new WebSocket('ws://192.168.10.63:8080/matching', action_base64)
 		ws.onmessage = onMessageMatchingWs
 	}
 
 	const joinMatchingRoom = () => {
 		const action = { type: 'JOIN', data: { player_name: playerName, room_id: roomId } }
 		const action_base64 = btoa(JSON.stringify(action)).replaceAll('=', '')
-		const ws = new WebSocket('ws://localhost:8080/matching', action_base64)
+		const ws = new WebSocket('ws://192.168.10.63:8080/matching', action_base64)
 		ws.onmessage = onMessageMatchingWs
 	}
 
