@@ -13,6 +13,7 @@ const Field = (props: Props) => {
 	const now_color: string = GameManager.getTurnColor(props.gameState.turn, props.gameState.players)
 
 	const settablePositions = GameManager.getSettablePositions(props.gameState.field, now_color)
+	if (settablePositions.length <= 0) props.executeAction({ type: 'PASS' })
 
 	const stones: JSX.Element[] = []
 	for (let y = 0; y < props.gameState.field[0].length; y++) {
