@@ -166,7 +166,7 @@ const Game = () => {
 					</div>
 				</div>
 			) : (
-				<div className='m-auto w-full max-w-[800px]'>
+				<div className='m-auto w-full max-w-[70vh]'>
 					<div className='flex flex-col gap-3 justify-center px-3 mx-auto max-w-full align-middle'>
 						<div className='flex gap-3 pb-6'>
 							<div
@@ -185,7 +185,7 @@ const Game = () => {
 							<div className='flex-1'></div>
 							<div
 								className={`bg-slate-100 rounded-lg shadow-lg p-3 min-[100px] w-[30%] transition duration-100 ${
-									!is_my_turn ? 'scale-125' : 'bg-slate-200'
+									is_my_turn ? 'scale-125' : 'bg-slate-200'
 								}`}
 							>
 								<p className='text-xl text-center truncate'>

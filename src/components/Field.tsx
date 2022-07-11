@@ -39,7 +39,7 @@ const Field = (props: Props) => {
 
 	return (
 		<div
-			className='flex flex-col w-full h-full bg-slate-100 border-4 border-slate-500 border-solid ring-2 ring-slate-400 shadow-md'
+			className='flex flex-col w-full h-full max-h-[70vh] bg-slate-100 border-4 border-slate-500 border-solid ring-2 ring-slate-400 shadow-md'
 			style={props.isMyTurn ? {} : { filter: 'grayscale(0.3)' }}
 		>
 			{stones}
